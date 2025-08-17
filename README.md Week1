@@ -1,0 +1,52 @@
+# Week 1 - Blockchain Cryptography  
+## 1. First Primitive  
+
+### 📝 Goal  
+Find the color from a SHA256 hash.  
+You can assume all hashes are generated only from colors in the COLORS array.  
+
+---
+
+### 🔹 Explanation  
+- Convert the string (color) to bytes using utf8ToBytes.  
+- Hash it with sha256.  
+- Convert the result into a hex string using toHex.  
+- Compare the given hash against each color's hash until you find the match.  
+
+---
+
+### 🔹 Example  
+
+```javascript
+const a = "apple";
+const b = "banana";
+
+const aBytes = utf8ToBytes(a);
+const bBytes = utf8ToBytes(b);
+
+const aHash = sha256(aBytes);
+const bHash = sha256(bBytes);
+
+console.log(toHex(aHash) === toHex(aHash)); // true
+console.log(toHex(aHash) === toHex(bHash)); // false
+```
+
+### 🔹 Solution
+
+```javascript
+const { sha256 } = require("ethereum-cryptography/sha256");
+const { toHex, utf8ToBytes } = require("ethereum-cryptography/utils");
+
+// the possible colors that the hash could represent
+const COLORS = ['red', 'green', 'blue', 'yellow', 'pink', 'orange'];
+
+// given a hash, return the color that created the hash
+function findColor(hash) {
+    return COLORS.find(x => toHex(sha256(utf8ToBytes(x))) === toHex(hash));
+}
+```
+
+module.exports = findColor;
+```
+
+
