@@ -1,0 +1,56 @@
+Proof of Work
+Now it's time to actually mine the block. This is where we get the work part of proof of work!
+
+In the mine function, prior to hashing the block, add a nonce property. This property should start at 0
+Keep changing the nonce until you find a hash that is less than the TARGET_DIFFICULTY
+
+```javascript
+const SHA256 = require('crypto-js/sha256');
+
+const TARGET_DIFFICULTY = BigInt('0x0fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff');
+const MAX_TRANSACTIONS = 10;
+
+const mempool = [];
+const blocks = [];
+
+function addTransaction(transaction) {
+  mempool.push(transaction);
+}
+
+function mine() {
+  const transactions = mempool.splice(0, MAX_TRANSACTIONS);
+
+  let nonce = 0;
+  let hash;
+  let hashInt;
+  let block;
+
+  do {
+    block = {
+    id: blocks.length,
+    transactions:transactions,
+    nonce: nonce
+  };
+
+  const stringified = JSON.stringify(block);
+  hash = SHA256(stringified).toString();
+  hashInt = BigInt(`0x${hash}`);
+  nonce++;
+} while (hashInt >= TARGET_DIFFICULTY);
+
+
+
+  block.hash = hash;
+
+  blocks.push(block);
+}
+
+module.exports = {
+  TARGET_DIFFICULTY,
+  MAX_TRANSACTIONS,
+  addTransaction,
+  mine,
+  blocks,
+  mempool,
+```
+};
