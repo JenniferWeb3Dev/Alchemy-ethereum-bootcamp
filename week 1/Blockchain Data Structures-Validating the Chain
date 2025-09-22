@@ -1,0 +1,34 @@
+Create an isValid Function
+Create a function called isValid on our Blockchain that will return true or false if a block is valid or invalid respectively
+isValid should check the integrity of every block in its chain by looking at each block's previousHash field and making sure that it is equal to the hash of the block before it.
+
+```javascript
+const Block = require('./Block');
+
+class Blockchain {
+  constructor() {
+    const genesisBlock = new Block("Genesis Block");
+    this.chain = [genesisBlock];
+  }
+
+  addBlock(block) {
+    const lastBlock = this.chain[this.chain.length - 1];
+    block.previousHash = lastBlock.toHash();
+    this.chain.push(block);
+  }
+
+  isValid() {
+    for (let i = 1; i < this.chain.length; i++) {
+      const currentBlock = this.chain[i];
+      const previousBlock = this.chain[i - 1];
+
+      if (currentBlock.previousHash !== previousBlock.toHash()) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+}
+
+module.exports = Blockchain;
