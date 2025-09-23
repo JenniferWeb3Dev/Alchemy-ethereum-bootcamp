@@ -1,0 +1,40 @@
+Remove Members
+Create a constructor which will add the deployer address as the first member of the stack club.
+Create a removeLastMember function which will remove the last member added to the club.
+ Function Security
+Ensure that the removeLastMember function can only be called by an existing member
+
+```javascript
+// SPDX-License-Identifier: MIT
+pragma solidity 0.8.4;
+
+contract StackClub {
+    address[] public members;
+
+    constructor() {
+        members.push(msg.sender);
+    }
+    modifier onlyMember() {
+        require(isMember(msg.sender), "not a member");
+        _;
+    }
+
+    function addMember(address newMember) external {
+        members.push(newMember);
+    }
+    function removeLastMember() external onlyMember {
+        require(members.length > 0, "no members to remove");
+        members.pop();
+    }
+
+    function isMember(address account) public view returns (bool) {
+        for(uint i = 0; i < members.length; i++) {
+            if (members[i] == account) {
+             return true;
+            }
+        }
+        return false;
+    }
+
+}
+```
