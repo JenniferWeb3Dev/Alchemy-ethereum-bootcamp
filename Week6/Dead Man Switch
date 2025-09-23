@@ -1,0 +1,45 @@
+ Implement the Switch
+Create three functions on the Switch contract:
+
+A public, payable constructor which takes a single argument: the address for the eventual recipient of the funds.
+An external withdraw function which will transfer all of the contract funds to the recipient address.
+An external ping function which restarts the period of inactivity.
+
+```javascript
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract Switch {
+    address public owner;
+    address payable public recipient;
+    uint256 public lastPing;
+
+    // 70 weeks = 70 * 7 * 24 * 60 * 60 = 42336000 seconds
+    uint256 constant INACTIVITY_PERIOD = 70 weeks;
+
+    constructor(address payable _recipient) payable {
+        require(_recipient != address(0), "Invalid recipient address");
+        recipient = _recipient;
+        owner = msg.sender;
+        lastPing = block.timestamp;
+    }
+
+    /// @notice Only the original owner (deployer) can ping
+    function ping() external {
+        require(msg.sender == owner, "Only the owner can ping");
+        lastPing = block.timestamp;
+    }
+
+    /// @notice Only recipient can withdraw after 70 weeks of no ping
+    function withdraw() external {
+        require(msg.sender == recipient, "Only recipient can withdraw");
+        require(block.timestamp >= lastPing + INACTIVITY_PERIOD, "Inactivity period not met");
+
+        uint256 balance = address(this).balance;
+        require(balance > 0, "No funds to withdraw");
+
+        (bool success, ) = recipient.call{value: balance}("");
+        require(success, "Transfer failed");
+    }
+}
+```
