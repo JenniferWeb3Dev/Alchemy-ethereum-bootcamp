@@ -1,0 +1,35 @@
+Complete Verify Proof
+The function verifyProof takes four parameters: proof, node, root and concat.
+
+Here are their definitions:
+
+proof - An array of objects whose properties are data and left. (The proof you created in the previous stage)
+node - A leaf node we're trying to prove is within the merkle tree.
+root - The valid Merkle Root.
+concat - The method used to combine the leaf nodes.
+Take the node and combine it with all the data provided in the proof.
+
+At this point you'll have your own root derived from the node and the proof. Compare this to the true root with === to see if they match.
+
+```javascript
+function verify(proof, node, root, concat) {
+    if (typeof concat !== 'function') {
+        throw new Error("concat must be a function");
+    }
+
+    let computed = node;
+
+    for (const { data, left } of proof) {
+        if (left) {
+            computed = concat(data, computed); // sibling is on the left
+        } else {
+            computed = concat(computed, data); // sibling is on the right
+        }
+    }
+
+    return computed === root;
+}
+
+module.exports = verify;
+```
+
