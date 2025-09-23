@@ -1,0 +1,52 @@
+Share Expenses
+Create an external function called payBill which takes an address for the venue and an uint amount for the total cost of the bill.
+Use the pooled funds in the contract to pay this bill amount to the venue address (you can assume the pooled funds from the deposit are enough to pay the bill).
+In the payBill function, evenly distribute the remaining funds among the members of the party.
+
+```javascript
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract Party {
+    uint256 public depositAmount;
+
+    mapping(address => bool) public hasRSVPed;
+    address[] public attendees;
+
+    constructor(uint256 _depositAmount) {
+        depositAmount = _depositAmount;
+    }
+
+    function rsvp() external payable {
+        require(!hasRSVPed[msg.sender], "Already RSVPed");
+        require(msg.value == depositAmount, "Incorrect deposit amount");
+
+        hasRSVPed[msg.sender] = true;
+        attendees.push(msg.sender);
+    }
+
+    function getAttendees() external view returns (address[] memory) {
+        return attendees;
+    }
+
+    function payBill(address payable venue, uint256 billAmount) external {
+        require(address(this).balance >= billAmount, "Not enough funds to pay the bill");
+
+        // ✅ Pay the venue
+        (bool sentToVenue, ) = venue.call{value: billAmount}("");
+        require(sentToVenue, "Failed to pay venue");
+
+        // ✅ Distribute remaining balance equally
+        uint256 remaining = address(this).balance;
+        uint256 refundPerPerson = remaining / attendees.length;
+
+        for (uint256 i = 0; i < attendees.length; i++) {
+            address payable attendee = payable(attendees[i]);
+            (bool sent, ) = attendee.call{value: refundPerPerson}("");
+            require(sent, "Refund failed");
+        }
+
+        // Note: leftover wei remains in the contract if not divisible evenly
+    }
+}
+```
