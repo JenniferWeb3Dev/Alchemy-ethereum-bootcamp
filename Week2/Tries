@@ -1,0 +1,17 @@
+Implement Contains
+Add a function contains to the Trie class.
+
+This function should take a string word and return true/false depending on whether the word is in our trie or not.
+
+```javascript
+
+class TrieNode {
+    constructor(key) {
+        this.key = key;
+        this.children = {};
+        this.isWord = false;
+    }
+}
+
+module.exports = TrieNode;
+```
