@@ -1,0 +1,70 @@
+Index the Addresses
+Modify all the address data types in the events to be indexed.
+
+```javascript
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract Collectible {
+    // Events
+    event Deployed(address indexed owner);
+    event Transfer(address indexed from, address indexed to);
+    event ForSale(uint256 price, uint256 timestamp);
+    event Purchase(uint256 amount, address indexed buyer);
+
+    // State variables
+    address public owner;
+    uint256 public askingPrice;
+    bool public forSale;
+
+    // Constructor sets the initial owner
+    constructor() {
+        owner = msg.sender;
+        emit Deployed(owner);
+    }
+
+    // Transfer ownership to another address
+    function transfer(address recipient) external {
+        require(msg.sender == owner, "Only the owner can transfer this collectible");
+        require(recipient != address(0), "Cannot transfer to the zero address");
+
+        address previousOwner = owner;
+        owner = recipient;
+
+        emit Transfer(previousOwner, recipient);
+    }
+
+    // Mark the collectible for sale at a given price
+    function markPrice(uint256 price) external {
+        require(msg.sender == owner, "Only the owner can mark the price");
+        require(price > 0, "Price must be greater than zero");
+
+        askingPrice = price;
+        forSale = true;
+
+        emit ForSale(price, block.timestamp);
+    }
+
+    // Allow someone to purchase the collectible at the asking price
+    function purchase() external payable {
+        require(forSale, "Collectible is not for sale");
+        require(msg.value == askingPrice, "Incorrect purchase amount");
+
+        address previousOwner = owner;
+
+        // Reset sale state before transferring funds to prevent reentrancy
+        forSale = false;
+        askingPrice = 0;
+
+        // Transfer ownership
+        owner = msg.sender;
+
+        // Transfer funds to the previous owner
+        payable(previousOwner).transfer(msg.value);
+
+        emit Transfer(previousOwner, msg.sender);
+        emit Purchase(msg.value, msg.sender);
+    }
+}
+```
+
