@@ -1,0 +1,10 @@
+Approve
+In the approve.js file, call the approve function on the Escrow contract using the arbiter signer.
+
+```javascript
+function approve(contract, arbiterSigner) {
+    return contract.connect(arbiterSigner).approve();
+}
+
+module.exports = approve;
+```
