@@ -1,0 +1,61 @@
+Change Vote
+Create an external function called changeVote which takes a Choices argument and changes the choice on the existing vote for the msg.sender.
+If they do not have an existing vote, revert the transaction. 
+
+```javascript
+// SPDX-License-Identifier: MIT
+pragma solidity 0.8.4;
+
+contract Contract {
+	enum Choices { Yes, No }
+
+	struct Vote {
+		Choices choice;
+		address voter;
+	}
+
+	Vote[] public votes;
+
+	mapping(address => bool) public hasVotedMap;
+	mapping(address => Choices) private voterChoices;
+
+	// Create a new vote (only once)
+	function createVote(Choices choice) external {
+		require(!hasVotedMap[msg.sender], "You have already voted");
+
+		votes.push(Vote({
+			choice: choice,
+			voter: msg.sender
+		}));
+
+		hasVotedMap[msg.sender] = true;
+		voterChoices[msg.sender] = choice;
+	}
+
+	// ✅ Change an existing vote
+	function changeVote(Choices newChoice) external {
+		require(hasVotedMap[msg.sender], "You have not voted yet");
+
+		// Update the mapping
+		voterChoices[msg.sender] = newChoice;
+
+		// Find and update the vote in the array
+		for (uint i = 0; i < votes.length; i++) {
+			if (votes[i].voter == msg.sender) {
+				votes[i].choice = newChoice;
+				break;
+			}
+		}
+	}
+
+	// Check if address has voted
+	function hasVoted(address voter) external view returns (bool) {
+		return hasVotedMap[voter];
+	}
+
+	// Get the voter's choice (assumes vote exists)
+	function findChoice(address voter) external view returns (Choices) {
+		return voterChoices[voter];
+	}
+}
+```
