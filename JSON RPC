@@ -1,0 +1,29 @@
+ Total Balance
+The getTotalBalance method will receive an array of several addresses.
+
+Take each address and find its ether balance
+Add all of these balances together to find the total balance of all the addresses and return it.
+
+```javascript
+const provider = require('./provider');
+
+async function getTotalBalance(addresses) {
+    let totalBalance = BigInt(0);
+
+    for (const address of addresses) {
+        const response = await provider.send({
+            jsonrpc: "2.0",
+            id: 1,
+            method: "eth_getBalance",
+            params: [address, "latest"]
+        });
+
+        const balance = BigInt(response.result);
+        totalBalance += balance;
+    }
+
+    return totalBalance.toString();
+}
+
+module.exports = getTotalBalance;
+```
