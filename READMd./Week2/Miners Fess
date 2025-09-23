@@ -1,0 +1,41 @@
+Calculate the fee!
+At the end of the execute function, calculate the fee as the sum of all the inputs minus the sum of all the outputs.
+
+Given that we throw an error if the inputs are insufficient, this number should be at least zero. Any time outputs are less, this should be a positive fee.
+Store the fee amount in a property called fee on the transaction itself.
+
+```javascript
+class Transaction {
+    constructor(inputUTXOs, outputUTXOs) {
+        this.inputUTXOs = inputUTXOs;
+        this.outputUTXOs = outputUTXOs;
+        this.fee = 0;
+    }
+
+    execute() {
+        // Check for double-spending
+        for (const txo of this.inputUTXOs) {
+            if (txo.spent) {
+                throw new Error('Input TXO has already been spent');
+            }
+        }
+
+        // Calculate total values
+        const totalInput = this.inputUTXOs.reduce((sum, txo) => sum + txo.amount, 0);
+        const totalOutput = this.outputUTXOs.reduce((sum, txo) => sum + txo.amount, 0);
+
+        // Check if inputs cover outputs
+        if (totalInput < totalOutput) {
+            throw new Error('Insufficient input value for outputs');
+        }
+
+        for (const txo of this.inputUTXOs) {
+            txo.spend();
+        }
+        this.fee = totalInput - totalOutput;
+    }
+}
+
+module.exports = Transaction;
+
+```
