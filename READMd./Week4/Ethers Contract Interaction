@@ -1,0 +1,13 @@
+Make a Deposit
+Complete the deposit function within the index.js to call the contract and deposit at least 1 ether.
+
+
+```javascript
+const ethers = require('ethers');
+
+function deposit(contract) {
+    return contract.deposit({ value: ethers.utils.parseEther("1") });
+}
+
+module.exports = deposit;
+```
