@@ -1,0 +1,21 @@
+Prime Block Winner
+You'll find the PrimeGame contract in the new file PrimeGame.sol. This file has already imported the Prime library for you.
+
+In this contract, create a function called isWinner that determines if the current block number is prime.
+If it is prime, return true. A winner! 
+If not, return false. 
+
+```javascript
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.4;
+
+import "./Prime.sol";
+
+contract PrimeGame {
+    using Prime for uint;
+
+    function isWinner() public view returns (bool) {
+        return block.number.isPrime();
+    }
+}
+```
